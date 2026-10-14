@@ -1,3 +1,5 @@
+"""Movie theater seat reservation system."""
+
 import json
 import os
 import hashlib
@@ -6,40 +8,58 @@ import hashlib
 shows = {"SHOW-1": {"title": "Interstellar", "seats": 20, "booked": []},
          "SHOW-2": {"title": "Dangal", "seats": 10, "booked": []}}
 
-def reserve_seat(show_id, seat_number, system_logs=[]):
+def reserve_seat(show_id, seat_number, system_logs=None):
+    """Reserve a seat and record the operation in the system log."""
+    if system_logs is None:
+        system_logs = []
     show = shows[show_id]
     if seat_number in show["booked"]:
-        system_logs.append("Seat %s already taken for %s" % (seat_number, show_id))
+        system_logs.append(f"Seat {seat_number} already taken for {show_id}")
         return False
     show["booked"].append(seat_number)
-    system_logs.append("Reserved seat %s for %s" % (seat_number, show_id))
+    system_logs.append(f"Reserved seat {seat_number} for {show_id}")
     return True
 
+
 def release_seat(show_id, seat_number):
+    """Release a previously booked seat."""
     try:
         shows[show_id]["booked"].remove(seat_number)
-    except:
+    except (KeyError, ValueError):
         pass
 
+
 def ticket_code(show_id, seat_number):
+    """Generate a ticket code for a show and seat."""
     return hashlib.md5((show_id + str(seat_number)).encode()).hexdigest()[:8]
 
+
 def dump_reservations(file="seats.json"):
-    f = open(file, "w")
-    f.write(json.dumps(shows))
+    """Save current reservations to a JSON file."""
+    with open(file, "w", encoding="utf-8") as reservation_file:
+        reservation_file.write(json.dumps(shows))
+
 
 def load_reservations(file="seats.json"):
-    global shows
-    f = open(file, "r")
-    data = f.read()
-    shows = json.loads(data)
+    """Load reservations from a JSON file."""
+    with open(file, "r", encoding="utf-8") as reservation_file:
+        data = json.load(reservation_file)
+    shows.clear()
+    shows.update(data)
 
-def printSeatingSummary():
-    for s in shows:
-        free = shows[s]["seats"] - len(shows[s]["booked"])
-        print(shows[s]["title"] + ": " + str(free) + " seats free, booked = " + str(shows[s]["booked"]))
+
+def print_seating_summary():
+    """Print the number of free and booked seats for each show."""
+    for show in shows.values():
+        free = show["seats"] - len(show["booked"])
+        print(
+            f"{show['title']}: {free} seats free, "
+            f"booked = {show['booked']}"
+        )
+
 
 def main():
+    """Run the sample reservation workflow."""
     reserve_seat("SHOW-1", 5)
     reserve_seat("SHOW-1", 5)
     reserve_seat("SHOW-1", 25)
@@ -51,7 +71,8 @@ def main():
     reserve_seat("SHOW-2", seat)
     dump_reservations()
     load_reservations()
-    printSeatingSummary()
+    print_seating_summary()
     os.chmod("seats.json", 0o777)
+
 
 main()
