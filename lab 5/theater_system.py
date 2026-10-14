@@ -8,6 +8,7 @@ import hashlib
 shows = {"SHOW-1": {"title": "Interstellar", "seats": 20, "booked": []},
          "SHOW-2": {"title": "Dangal", "seats": 10, "booked": []}}
 
+
 def reserve_seat(show_id, seat_number, system_logs=None):
     """Reserve a seat and record the operation in the system log."""
     if system_logs is None:
