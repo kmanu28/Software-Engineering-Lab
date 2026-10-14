@@ -31,7 +31,8 @@ def release_seat(show_id, seat_number):
 
 def ticket_code(show_id, seat_number):
     """Generate a ticket code for a show and seat."""
-    return hashlib.md5((show_id + str(seat_number)).encode()).hexdigest()[:8]
+    ticket_data = (show_id + str(seat_number)).encode("utf-8")
+    return hashlib.sha256(ticket_data).hexdigest()[:8]
 
 
 def dump_reservations(file="seats.json"):
@@ -72,7 +73,7 @@ def main():
     dump_reservations()
     load_reservations()
     print_seating_summary()
-    os.chmod("seats.json", 0o777)
+    os.chmod("seats.json", 0o600)
 
 
 main()
