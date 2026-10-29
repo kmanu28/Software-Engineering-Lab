@@ -60,9 +60,6 @@ def test_hardcover_and_textbook_conditions():
             ]
         }
     ]
-    # Textbook base: 40. mint = 40 * 1.25 = 50. poor = 40 * 0.40 = 16. credit bonus = 5 -> batch = 71
-    # Hardcover base: 15. good = 15 -> batch = 15
-    # Total = 86
     result = process_book_buybacks(batches, 5.0)
     assert result["total_payout"] == 86.0
     assert result["status"] == "COMPLETED"
@@ -98,7 +95,7 @@ def test_missing_pages_and_counterfeit():
             "payout_in_credit": False,
             "books": [
                 {"missing_pages": 0, "condition": "mint", "counterfeit": False},
-                {"missing_pages": 0, "condition": "good", "counterfeit": True},  # breaks and resets batch_credit to 0
+                {"missing_pages": 0, "condition": "good", "counterfeit": True},
             ]
         }
     ]
@@ -137,6 +134,6 @@ def test_inspect_scanner_calibrated():
 def test_inspect_scanner_recalibrate():
     matrix = [
         [1, 2, 3],
-        [6, 7, 1]  # streak >= 2
+        [6, 7, 1]
     ]
     assert inspect_scanner_calibration(matrix) == "RECALIBRATE"
